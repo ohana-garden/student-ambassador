@@ -1,6 +1,6 @@
 {
   "name": "Student Ambassador",
-  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11-bookworm",
   "postCreateCommand": "pip install -r requirements.txt",
   "customizations": {
     "vscode": {
