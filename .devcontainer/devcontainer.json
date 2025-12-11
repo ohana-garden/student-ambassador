@@ -4,8 +4,8 @@
   "features": {
     "ghcr.io/devcontainers/features/node:1": {}
   },
-  "postCreateCommand": "pip install -r requirements.txt",
-  "postStartCommand": "uvicorn src.main:app --host 0.0.0.0 --port 8000 &",
+  "postCreateCommand": "pip install -r requirements.txt && echo 'Dependencies installed'",
+  "postStartCommand": "nohup uvicorn src.main:app --host 0.0.0.0 --port 8000 > /tmp/uvicorn.log 2>&1 &",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -21,7 +21,7 @@
   "portsAttributes": {
     "8000": {
       "label": "Student Ambassador API",
-      "onAutoForward": "notify",
+      "onAutoForward": "openBrowser",
       "visibility": "public"
     }
   }
