@@ -4,16 +4,16 @@ These Pydantic models mirror the JSON schema definitions used in the specificati
 They provide type checking and validation for request and response bodies.
 """
 
-from datetime import date, datetime
-from typing import List, Optional, Dict, Any
+from datetime import date as date_type, datetime
+from typing import List, Optional, Dict, Any, Annotated
 
-from pydantic import BaseModel, Field, constr
+from pydantic import BaseModel, Field, StringConstraints
 
 
 class Document(BaseModel):
     """A file uploaded by the student, stored encrypted on device."""
 
-    type: constr(strip_whitespace=True, to_lower=True) = Field(
+    type: Annotated[str, StringConstraints(strip_whitespace=True, to_lower=True)] = Field(
         ..., description="Type of document (e.g., transcript, award_letter)."
     )
     content_hash: str = Field(..., description="Hash of the file content for deduplication.")
@@ -25,7 +25,7 @@ class TestScore(BaseModel):
 
     type: str = Field(..., description="Type of test (e.g., SAT, ACT, AP).")
     score: float = Field(..., ge=0, description="Numeric score obtained.")
-    date: date = Field(..., description="Date of the test.")
+    test_date: date_type = Field(..., description="Date of the test.")
 
 
 class Activity(BaseModel):
@@ -50,10 +50,8 @@ class Recommendation(BaseModel):
     """Recommendation request and status."""
 
     recommender: str
-    status: constr(strip_whitespace=True, to_lower=True) = Field(
-        ..., regex="^(requested|received|submitted)$"
-    )
-    requested_date: date
+    status: Annotated[str, StringConstraints(strip_whitespace=True, to_lower=True, pattern="^(requested|received|submitted)$")] = Field(...)
+    requested_date: date_type
 
 
 class Student(BaseModel):
@@ -75,9 +73,7 @@ class Application(BaseModel):
     id: str
     student_id: str
     school_id: str
-    status: constr(strip_whitespace=True, to_lower=True) = Field(
-        ..., regex="^(draft|submitted|accepted|rejected)$"
-    )
+    status: Annotated[str, StringConstraints(strip_whitespace=True, to_lower=True, pattern="^(draft|submitted|accepted|rejected)$")] = Field(...)
     timeline: Dict[str, Any] = Field(default_factory=dict)
 
 
@@ -86,9 +82,7 @@ class Negotiation(BaseModel):
 
     id: str
     student_id: str
-    type: constr(strip_whitespace=True, to_lower=True) = Field(
-        ..., regex="^(scholarship|grant|appeal|other)$"
-    )
+    negotiation_type: Annotated[str, StringConstraints(strip_whitespace=True, to_lower=True, pattern="^(scholarship|grant|appeal|other)$")] = Field(...)
     ask: Dict[str, Any]
     result: Optional[str] = None
     strategy_used: Optional[str] = None
@@ -100,9 +94,9 @@ class ScholarshipSource(BaseModel):
 
     id: str
     name: str
-    amount_range: List[float] = Field(..., min_items=2, max_items=2)
+    amount_range: List[float] = Field(..., min_length=2, max_length=2)
     criteria: str
-    deadline: date
+    deadline: date_type
 
 
 class ScholarshipMatch(BaseModel):
